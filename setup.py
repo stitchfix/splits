@@ -7,6 +7,7 @@ setup(
     author_email='millar.thomas@gmail.com, magnussj@gmail.com',
     license='MIT',
     long_description='Stitchfix Library for dealing with splittable files',
+    description='Stitchfix Library for dealing with splittable files',
     url='https://github.com/stitchfix/splits',
     keywords=['split', 'multifile', 'splittable'],
     classifiers=[
