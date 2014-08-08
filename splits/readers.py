@@ -2,10 +2,11 @@ import copy
 
 from splits.util import path_for_part
 
+
 class SplitReader(object):
     def __init__(self, manifest_path,
                  fileClass=open,
-                 fileArgs={ 'mode' : 'r' }):
+                 fileArgs={'mode': 'r'}):
         self.fileClass = fileClass
         self.fileArgs = copy.deepcopy(fileArgs)
 
@@ -42,4 +43,3 @@ class SplitReader(object):
             for line in f.readlines():
                 yield line[:-1]
             f.close()
-

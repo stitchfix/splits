@@ -5,6 +5,7 @@ import os
 
 from splits import SplitWriter
 
+
 class TestMultiWriter(unittest.TestCase):
 
     def setUp(self):
@@ -23,7 +24,7 @@ class TestMultiWriter(unittest.TestCase):
         return os.path.isfile(path)
 
     def test_writes_correct_number_of_files(self):
-        self.writer.write('\n'.join([ str(x) for x in range(0, 10)]))
+        self.writer.write('\n'.join([str(x) for x in range(0, 10)]))
 
         for i in range(1, 6):
             self.assertTrue(self.fileExists('%06d.txt' % i))
@@ -45,4 +46,3 @@ class TestMultiWriter(unittest.TestCase):
             self.assertTrue(self.fileExists('%06d.txt' % i))
 
         self.assertFalse(self.fileExists('%06d.txt' % 7))
-

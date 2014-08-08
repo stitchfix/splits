@@ -5,6 +5,7 @@ import os
 
 from splits import SplitReader, SplitWriter
 
+
 class TestMultiReader(unittest.TestCase):
 
     def setUp(self):
@@ -13,7 +14,7 @@ class TestMultiReader(unittest.TestCase):
         os.makedirs(self.path)
 
         self.writer = SplitWriter(self.path, suffix='.txt', lines_per_file=2)
-        self.writer.writelines([ str(x) for x in range(0,10)])
+        self.writer.writelines([str(x) for x in range(0, 10)])
         self.writer.close()
 
         self.reader = SplitReader(self.path + '.manifest')
@@ -35,4 +36,3 @@ class TestMultiReader(unittest.TestCase):
         self.assertEquals(len(lines.split('\n')), 10)
         for index, x in enumerate(lines.split('\n')):
             self.assertEquals(x, str(index))
-

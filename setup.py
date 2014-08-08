@@ -13,7 +13,7 @@ setup(
     classifiers=[
         'Programming Language :: Python :: 2.7.2',
     ],
-    install_requires = [
+    install_requires=[
         'boto',
         'nose'
     ]

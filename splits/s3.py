@@ -3,9 +3,11 @@ import gzip
 import boto.s3
 import urlparse
 
+
 def is_s3_uri(uri):
     uri = str(uri)
     return uri.startswith('s3://') or uri.startswith('s3n://')
+
 
 class S3Uri(object):
 
@@ -52,12 +54,12 @@ class S3(object):
 
     def _list_prefix(self, s3uri):
         results = self._conn.get_bucket(s3uri.bucket).list(s3uri.path, delimiter='/')
-        return (S3Uri('s3://{0}/{1}'.format(s3uri.bucket,i.name)) for i in results)
+        return (S3Uri('s3://{0}/{1}'.format(s3uri.bucket, i.name)) for i in results)
 
     def _list_buckets(self):
         return (S3Uri('s3://{0}'.format(i.name)) for i in self._conn.get_all_buckets())
 
-    def ls(self, uri = None):
+    def ls(self, uri=None):
         if uri:
             s3uri = S3Uri(uri)
             return self._list_prefix(s3uri)
@@ -69,7 +71,7 @@ class S3(object):
         assert uri.is_file()
         self._conn.get_bucket(uri.bucket)\
                   .new_key(uri.path)\
-                  .set_contents_from_file(file, rewind = True)
+                  .set_contents_from_file(file, rewind=True)
 
     def getfile(self, uri, file):
         if not isinstance(uri, S3Uri):
@@ -80,10 +82,12 @@ class S3(object):
                   .new_key(uri.path)\
                   .get_contents_to_file(file)
 
+
 class S3File(StringIO.StringIO):
     s3 = S3()
+
     def __init__(self, uri, mode='r'):
-        self.mode  = mode
+        self.mode = mode
         self.s3uri = S3Uri(uri)
         assert self.s3uri.is_file(), "Uri (got {0}) must be a file (not directory or bucket) on S3.".format(self.uri)
         StringIO.StringIO.__init__(self)
@@ -103,13 +107,13 @@ class S3File(StringIO.StringIO):
             self.flush()
             self.s3.putfile(self, self.s3uri)
 
+
 class GzipS3File(gzip.GzipFile):
     def __init__(self, uri, *args, **kwargs):
         mode = kwargs['mode'] if 'mode' in kwargs else 'r'
         self.s3File = S3File(uri, mode=mode)
-        super(GzipS3File, self).__init__(fileobj = self.s3File, mode=mode)
+        super(GzipS3File, self).__init__(fileobj=self.s3File, mode=mode)
 
     def close(self):
         super(GzipS3File, self).close()
         self.s3File.close()
-

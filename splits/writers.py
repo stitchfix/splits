@@ -3,12 +3,13 @@ import copy
 
 from splits.util import path_for_part
 
+
 class SplitWriter(object):
     def __init__(self, basepath,
                  suffix='',
                  lines_per_file=100000,
                  fileClass=open,
-                 fileArgs={ 'mode' : 'w' }):
+                 fileArgs={'mode': 'w'}):
         self.suffix = suffix
         self.basepath = basepath
         self.lines_per_file = lines_per_file
@@ -48,7 +49,7 @@ class SplitWriter(object):
         path += '.manifest'
 
         f = self.fileClass(path, **self.fileArgs)
-        f.write(''.join([ x + '\n' for x in self._written_file_paths ]))
+        f.write(''.join([x + '\n' for x in self._written_file_paths]))
         f.close()
 
     def _get_current_file(self):
@@ -67,4 +68,3 @@ class SplitWriter(object):
         path = path_for_part(self.basepath, self._seqnum, self.suffix)
         self._written_file_paths.append(path)
         return self.fileClass(path, **self.fileArgs)
-
