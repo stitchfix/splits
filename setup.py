@@ -6,6 +6,7 @@ setup(
     author='Thomas Millar, Jeff Magnusson',
     author_email='millar.thomas@gmail.com, magnussj@gmail.com',
     license='MIT',
+    description='A Python library for dealing with splittable files',
     long_description='Stitchfix Library for dealing with splittable files',
     description='Stitchfix Library for dealing with splittable files',
     url='https://github.com/stitchfix/splits',
@@ -13,7 +14,7 @@ setup(
     classifiers=[
         'Programming Language :: Python :: 2.7.2',
     ],
-    install_requires = [
+    install_requires=[
         'boto',
         'nose'
     ]
