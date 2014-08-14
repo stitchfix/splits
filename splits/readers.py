@@ -2,7 +2,6 @@ import copy
 
 from splits.util import path_for_part
 
-
 class SplitReader(object):
     def __init__(self, manifest_path,
                  fileClass=open,
@@ -18,6 +17,7 @@ class SplitReader(object):
             self.manifest = [x[:-1] for x in f.readlines()]
 
         self._lines = iter(self._get_lines())
+        self._buf = ''
 
     def __enter__(self):
         return self
@@ -31,8 +31,40 @@ class SplitReader(object):
     def close(self):
         pass
 
-    def read(self):
-        return '\n'.join(self.readlines())
+    def read(self, num=None):
+        if num and num > 0:
+            buf = ''
+            while num > 0:
+                try:
+                    line = self._buf if self._buf else next(self._lines)
+                except:
+                    return ''
+
+                if len(line) > num:
+                    buf += line[:num]
+                    self._buf = line[num:]
+                    num = 0
+                else:
+                    buf += line
+                    num -= len(line)
+                    self._buf = ''
+
+            return buf
+        else:
+            return ''.join(self.readlines())
+
+    def readline(self, limit=None):
+        try:
+            line = self._buf if self._buf else next(self._lines)
+
+            if limit and len(line) > limit:
+                self._buf = line[limit:]
+                return line[:limit]
+
+            self._buf = ''
+            return line
+        except:
+            return ''
 
     def readlines(self):
         return list(self._lines)
@@ -41,5 +73,5 @@ class SplitReader(object):
         for path in self.manifest:
             f = self.fileClass(path, **self.fileArgs)
             for line in f.readlines():
-                yield line[:-1]
+                yield line
             f.close()

@@ -32,7 +32,7 @@ class TestMultiWriter(unittest.TestCase):
         self.assertFalse(self.fileExists('%06d.txt' % 6))
 
     def test_writes_correct_number_of_files_with_writelines(self):
-        self.writer.writelines([str(x) for x in range(0, 10)])
+        self.writer.writelines('\n'.join([str(x) for x in range(0, 10)]))
 
         for i in range(1, 6):
             self.assertTrue(self.fileExists('%06d.txt' % i))
@@ -40,7 +40,7 @@ class TestMultiWriter(unittest.TestCase):
         self.assertFalse(self.fileExists('%06d.txt' % 6))
 
     def test_writes_odd_number_of_lines(self):
-        self.writer.writelines([str(x) for x in range(0, 11)])
+        self.writer.writelines('\n'.join([str(x) for x in range(0, 11)]))
 
         for i in range(1, 7):
             self.assertTrue(self.fileExists('%06d.txt' % i))
