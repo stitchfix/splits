@@ -28,8 +28,11 @@ class SplitWriter(object):
         self.close()
 
     def write(self, data):
-        for line in data.split('\n'):
-            self._write_line(line)
+        for index, line in enumerate(data.split('\n')):
+            if index == data.count('\n'):
+                self._write_line(line)
+            else:
+                self._write_line(line + '\n')
 
     def writelines(self, lines):
         for line in lines:
@@ -37,9 +40,9 @@ class SplitWriter(object):
 
     def _write_line(self, line):
         f = self._get_current_file()
-        f.write(line + '\n')
-        self._linenum += 1
-        self._filelinenum += 1
+        f.write(line)
+        self._linenum += line.count('\n')
+        self._filelinenum += line.count('\n')
 
     def close(self):
         if self._current_file:
