@@ -28,8 +28,9 @@ class SplitWriter(object):
         self.close()
 
     def write(self, data):
+        cnt = data.count('\n')
         for index, line in enumerate(data.split('\n')):
-            if index == data.count('\n'):
+            if index == cnt:
                 self._write_line(line)
             else:
                 self._write_line(line + '\n')
