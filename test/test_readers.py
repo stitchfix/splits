@@ -54,3 +54,26 @@ class TestMultiReader(unittest.TestCase):
         line = self.reader.readline()
         self.assertEquals('1\n', line)
 
+    def test_manual_manifest(self):
+        manifest = [os.path.join(self.path, '%06d%s' % (x, '.txt'))
+                    for x in range(1,6)]
+
+        self.reader = SplitReader(manifest)
+        lines = self.reader.read()
+
+        self.assertEquals(len(lines.split('\n')), 10)
+        for index, x in enumerate(lines.split('\n')):
+            self.assertEquals(x, str(index))
+
+    def test_manual_subset_manifest(self):
+        manifest = [os.path.join(self.path, '%06d%s' % (x, '.txt'))
+                    for x in range(1,4)]
+
+        self.reader = SplitReader(manifest)
+        lines = self.reader.read()
+
+        self.assertEquals(len(lines.split('\n')[:-1]), 6)
+        for index, x in enumerate(lines.split('\n')[:-1]):
+            self.assertEquals(x, str(index))
+
+

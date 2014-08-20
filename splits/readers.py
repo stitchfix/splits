@@ -3,18 +3,21 @@ import copy
 from splits.util import path_for_part
 
 class SplitReader(object):
-    def __init__(self, manifest_path,
+    def __init__(self, manifest_path_or_list,
                  fileClass=open,
                  fileArgs={'mode': 'r'}):
         self.fileClass = fileClass
         self.fileArgs = copy.deepcopy(fileArgs)
 
-        if not manifest_path.endswith('.manifest'):
-            manifest_path += '.manifest'
+        if type(manifest_path_or_list) == list:
+            self.manifest = manifest_path_or_list
+        else:
+            if not manifest_path_or_list.endswith('.manifest'):
+                manifest_path_or_list += '.manifest'
 
-        with self.fileClass(manifest_path, **self.fileArgs) as f:
-            # remove newlines from filenames
-            self.manifest = [x[:-1] for x in f.readlines()]
+            with self.fileClass(manifest_path_or_list, **self.fileArgs) as f:
+                # remove newlines from filenames
+                self.manifest = [x[:-1] for x in f.readlines()]
 
         self._lines = iter(self._get_lines())
         self._buf = ''
