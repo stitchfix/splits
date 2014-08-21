@@ -23,12 +23,6 @@ class TestMultiReader(unittest.TestCase):
         self.reader.close()
         shutil.rmtree(self.temp_dir_path)
 
-    def test_read_lines(self):
-        lines = self.reader.readlines()
-
-        self.assertEquals(len(lines), 10)
-        self.assertEquals(''.join(lines), '\n'.join([str(x) for x in range(0, 10)]))
-
     def test_read(self):
         lines = self.reader.read()
 
@@ -46,6 +40,10 @@ class TestMultiReader(unittest.TestCase):
 
         self.assertEquals(self.reader.read(1), '')
 
+    def test_read_n_chars(self):
+        chars = self.reader.read(11)
+        self.assertEquals(chars, '0\n1\n2\n3\n4\n5')
+
     def test_read_line_n_chars(self):
         line = self.reader.readline(1)
         self.assertEquals('0', line)
@@ -53,6 +51,10 @@ class TestMultiReader(unittest.TestCase):
         self.assertEquals('\n', line)
         line = self.reader.readline()
         self.assertEquals('1\n', line)
+        line = self.reader.readline(2)
+        self.assertEquals('2\n', line)
+        line = self.reader.readline()
+        self.assertEquals('3\n', line)
 
     def test_manual_manifest(self):
         manifest = [os.path.join(self.path, '%06d%s' % (x, '.txt'))

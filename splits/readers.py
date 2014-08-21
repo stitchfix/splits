@@ -10,17 +10,17 @@ class SplitReader(object):
         self.fileArgs = copy.deepcopy(fileArgs)
 
         if type(manifest_path_or_list) == list:
-            self.manifest = manifest_path_or_list
+            self.manifest = iter(self._get_files(manifest_path_or_list))
         else:
             if not manifest_path_or_list.endswith('.manifest'):
                 manifest_path_or_list += '.manifest'
 
             with self.fileClass(manifest_path_or_list, **self.fileArgs) as f:
                 # remove newlines from filenames
-                self.manifest = [x[:-1] for x in f.readlines()]
+                self.manifest = iter(self._get_files([x[:-1] for x in f.readlines()]))
 
-        self._lines = iter(self._get_lines())
-        self._buf = ''
+        self._current_file = next(self.manifest)
+
 
     def __enter__(self):
         return self
@@ -35,46 +35,58 @@ class SplitReader(object):
         pass
 
     def read(self, num=None):
-        if num and num > 0:
-            buf = ''
-            while num > 0:
-                try:
-                    line = self._buf if self._buf else next(self._lines)
-                except:
-                    return ''
-
-                if len(line) > num:
-                    buf += line[:num]
-                    self._buf = line[num:]
-                    num = 0
+        val = ''
+        try:
+            while True:
+                if num > 0:
+                    new_data = self._get_current_file().read(num - len(val))
                 else:
-                    buf += line
-                    num -= len(line)
-                    self._buf = ''
+                    new_data = self._get_current_file().read()
 
-            return buf
-        else:
-            return ''.join(self.readlines())
+                if not new_data:
+                    self._current_file.close()
+                else:
+                    val += new_data
+
+                if num > 0 and len(val) == num:
+                    break
+        except:
+            pass
+
+        return val
 
     def readline(self, limit=None):
+        line = ''
+
         try:
-            line = self._buf if self._buf else next(self._lines)
+            while True:
+                if limit > 0:
+                    new_data = self._get_current_file().readline(limit - len(line))
+                else:
+                    new_data = self._get_current_file().readline()
 
-            if limit and len(line) > limit:
-                self._buf = line[limit:]
-                return line[:limit]
+                if not new_data:
+                    self._current_file.close()
+                else:
+                    line += new_data
 
-            self._buf = ''
-            return line
+                if limit > 0 and len(line) == limit:
+                    break
+                elif line.endswith('\n'):
+                    break
         except:
-            return ''
+            pass
 
-    def readlines(self):
-        return list(self._lines)
+        return line
 
-    def _get_lines(self):
-        for path in self.manifest:
+    def _get_current_file(self):
+        if self._current_file.closed:
+            self._current_file = next(self.manifest)
+
+        return self._current_file
+
+    def _get_files(self, manifest):
+        for path in manifest:
             f = self.fileClass(path, **self.fileArgs)
-            for line in f.readlines():
-                yield line
+            yield f
             f.close()
