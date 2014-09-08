@@ -3,7 +3,6 @@ import gzip
 import boto.s3
 import urlparse
 
-
 def is_s3_uri(uri):
     uri = str(uri)
     return uri.startswith('s3://') or uri.startswith('s3n://')
@@ -52,6 +51,10 @@ class S3(object):
     def secret_key(self):
         return self._conn.secret_key
 
+    @property
+    def security_token(self):
+        return self._conn.provider.security_token
+
     def _list_prefix(self, s3uri):
         results = self._conn.get_bucket(s3uri.bucket).list(s3uri.path, delimiter='/')
         return (S3Uri('s3://{0}/{1}'.format(s3uri.bucket, i.name)) for i in results)
@@ -66,21 +69,29 @@ class S3(object):
         return self._list_buckets()
 
     def putfile(self, file, uri):
-        if not isinstance(uri, S3Uri):
-            uri = S3Uri(uri)
+        uri = S3Uri(uri)
         assert uri.is_file()
         self._conn.get_bucket(uri.bucket)\
                   .new_key(uri.path)\
                   .set_contents_from_file(file, rewind=True)
 
     def getfile(self, uri, file):
-        if not isinstance(uri, S3Uri):
-            uri = S3Uri(uri)
-
+        uri = S3Uri(uri)
         assert uri.is_file()
         self._conn.get_bucket(uri.bucket)\
                   .new_key(uri.path)\
                   .get_contents_to_file(file)
+
+    def getstring(self, uri):
+        uri = S3Uri(uri)
+        assert uri.is_file()
+        return self._conn.get_bucket(uri.bucket).new_key(uri.path).get_contents_as_string()
+
+    def putstring(self, string, uri):
+        uri = S3Uri(uri)
+        assert uri.is_file()
+        self._conn.get_bucket(uri.bucket).new_key(uri.path).set_contents_from_string(string)
+
 
 
 class S3File(StringIO.StringIO):
