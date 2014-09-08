@@ -84,17 +84,22 @@ class S3(object):
 
 
 class S3File(StringIO.StringIO):
-    s3 = S3()
+    s3 = None
 
     def __init__(self, uri, mode='r'):
         self.mode = mode
         self.s3uri = S3Uri(uri)
         assert self.s3uri.is_file(), "Uri (got {0}) must be a file (not directory or bucket) on S3.".format(self.uri)
+        self.__init_s3()
         StringIO.StringIO.__init__(self)
 
         if self.mode == 'r':
             self.s3.getfile(self.s3uri, self)
             self.seek(0)
+
+    def __init_s3(cls):
+        if not cls.s3:
+            cls.s3 = S3()
 
     def __enter__(self):
         return self
