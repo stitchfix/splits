@@ -44,6 +44,10 @@ class TestMultiReader(unittest.TestCase):
         chars = self.reader.read(11)
         self.assertEquals(chars, '0\n1\n2\n3\n4\n5')
 
+    def test_readlines(self):
+        lines = self.reader.readlines()
+        self.assertEquals(len(lines), 10)
+
     def test_read_line_n_chars(self):
         line = self.reader.readline(1)
         self.assertEquals('0', line)
@@ -55,6 +59,13 @@ class TestMultiReader(unittest.TestCase):
         self.assertEquals('2\n', line)
         line = self.reader.readline()
         self.assertEquals('3\n', line)
+
+    def test_reader_is_iterator(self):
+        count = 0
+        for line in self.reader:
+            count += 1
+
+        self.assertEquals(count, 10)
 
     def test_manual_manifest(self):
         manifest = [os.path.join(self.path, '%06d%s' % (x, '.txt'))
