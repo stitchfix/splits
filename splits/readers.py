@@ -29,7 +29,16 @@ class SplitReader(object):
         pass
 
     def __iter__(self):
-        return self._get_lines()
+        return self
+
+    def __next__(self):
+        return self.next()
+
+    def next(self):
+        line = self.readline()
+        if line:
+            return line
+        raise StopIteration()
 
     def close(self):
         pass
@@ -78,6 +87,16 @@ class SplitReader(object):
             pass
 
         return line
+
+    def readlines(self, sizehint=None):
+        all_lines = []
+        line = self.readline()
+
+        while line:
+            all_lines.append(line)
+            line = self.readline()
+
+        return all_lines
 
     def _get_current_file(self):
         if self._current_file.closed:
