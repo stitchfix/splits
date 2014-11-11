@@ -21,7 +21,10 @@ class S3Uri(object):
 
     @property
     def path(self):
-        return self._parseresult.path
+        p = self._parseresult.path
+        if p.startswith('/'):
+            p = p[1:]
+        return p
 
     @property
     def name(self):
@@ -68,6 +71,12 @@ class S3(object):
             return self._list_prefix(s3uri)
         return self._list_buckets()
 
+    def get_key(self, uri):
+        uri = S3Uri(uri)
+        assert uri.is_file()
+        return self._conn.get_bucket(uri.bucket)\
+                         .get_key(uri.path)
+
     def putfile(self, file, uri):
         uri = S3Uri(uri)
         assert uri.is_file()
@@ -100,7 +109,7 @@ class S3File(StringIO.StringIO):
     def __init__(self, uri, mode='r'):
         self.mode = mode
         self.s3uri = S3Uri(uri)
-        assert self.s3uri.is_file(), "Uri (got {0}) must be a file (not directory or bucket) on S3.".format(self.uri)
+        assert self.s3uri.is_file(), "Uri (got {0}) must be a file (not directory or bucket) on S3.".format(uri)
         self.__init_s3()
         StringIO.StringIO.__init__(self)
 
