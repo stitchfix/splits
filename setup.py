@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='splits',
-    version='0.0.6',
+    version='0.0.7',
     author='Thomas Millar, Jeff Magnusson',
     author_email='millar.thomas@gmail.com, magnussj@gmail.com',
     license='MIT',
