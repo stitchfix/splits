@@ -1,6 +1,7 @@
 import StringIO
 import gzip
 import boto.s3
+import boto.s3.connection
 import urlparse
 
 def is_s3_uri(uri):
@@ -44,7 +45,10 @@ class S3Uri(object):
 class S3(object):
 
     def __init__(self, region='us-east-1'):
-        self._conn = boto.s3.connect_to_region(region)
+        self._conn = boto.s3.connect_to_region(
+            region,
+            calling_format=boto.s3.connection.OrdinaryCallingFormat()
+    )
 
     @property
     def access_key(self):
