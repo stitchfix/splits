@@ -1,7 +1,12 @@
 import StringIO
 import gzip
 import boto.s3
+import boto.s3.connection
 import urlparse
+import logging
+
+logger = logging.getLogger('splits.s3')
+logger.setLevel('INFO')
 
 def is_s3_uri(uri):
     uri = str(uri)
@@ -45,6 +50,10 @@ class S3(object):
 
     def __init__(self, region='us-east-1'):
         self._conn = boto.s3.connect_to_region(region)
+        self._conn = boto.s3.connect_to_region(
+            region,
+            calling_format=boto.s3.connection.OrdinaryCallingFormat()
+    )
 
     @property
     def access_key(self):
@@ -100,6 +109,17 @@ class S3(object):
         uri = S3Uri(uri)
         assert uri.is_file()
         self._conn.get_bucket(uri.bucket).new_key(uri.path).set_contents_from_string(string)
+
+    def delete_child_files(self, uri):
+        uri = S3Uri(uri)
+        returned_keys = self._conn.get_bucket(uri.bucket).delete_keys(list(self.get_key(str(i)) for i in self.ls(uri)))
+
+        for deleted_key in returned_keys.deleted:
+            logger.info('DELETED: %s' % deleted_key.key)    
+
+        if(len(returned_keys.errors) != 0):
+            for errored_key in returned_keys.errors:
+                logger.info('ERRORED: %s' % errored_key.key)
 
 
 
