@@ -3,11 +3,11 @@ import gzip
 import boto.s3
 import boto.s3.connection
 import urlparse
+from itertools import groupby
 
 def is_s3_uri(uri):
     uri = str(uri)
     return uri.startswith('s3://') or uri.startswith('s3n://')
-
 
 class S3Uri(object):
 
@@ -22,7 +22,7 @@ class S3Uri(object):
 
     @property
     def path(self):
-        p = self._parseresult.path
+        p = self._parseresult.path 
         if p.startswith('/'):
             p = p[1:]
         return p
@@ -105,7 +105,18 @@ class S3(object):
         assert uri.is_file()
         self._conn.get_bucket(uri.bucket).new_key(uri.path).set_contents_from_string(string)
 
+    def rm(self, uris):
+        uris = [S3Uri(uri) for uri in uris]
 
+        for bucket, group in groupby(
+            sorted(uris, key=lambda uri: uri.bucket), lambda i: i.bucket):
+                returned_keys = self._conn.get_bucket(bucket)\
+                                    .delete_keys(
+                                        boto.s3.key.Key(bucket, i.path) for i in group)
+
+                if(len(returned_keys.errors) > 0):
+                    raise IOError('Could not delete keys: {keys}'.format(
+                        keys=[k for k in returned_keys.errors]))
 
 class S3File(StringIO.StringIO):
     s3 = None
