@@ -22,7 +22,7 @@ class S3Uri(object):
 
     @property
     def path(self):
-        p = self._parseresult.path  
+        p = self._parseresult.path 
         if p.startswith('/'):
             p = p[1:]
         return p
@@ -45,7 +45,6 @@ class S3Uri(object):
 class S3(object):
 
     def __init__(self, region='us-east-1'):
-        self._conn = boto.s3.connect_to_region(region)
         self._conn = boto.s3.connect_to_region(
             region,
             calling_format=boto.s3.connection.OrdinaryCallingFormat()
