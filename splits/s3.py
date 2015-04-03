@@ -3,6 +3,7 @@ import gzip
 import boto.s3
 import boto.s3.connection
 import urlparse
+import zipfile
 from itertools import groupby
 
 def is_s3_uri(uri):
@@ -22,7 +23,7 @@ class S3Uri(object):
 
     @property
     def path(self):
-        p = self._parseresult.path 
+        p = self._parseresult.path
         if p.startswith('/'):
             p = p[1:]
         return p
@@ -121,11 +122,14 @@ class S3(object):
 class S3File(StringIO.StringIO):
     s3 = None
 
-    def __init__(self, uri, mode='r'):
+    def __init__(self, uri, mode='r', s3 = None):
         self.mode = mode
         self.s3uri = S3Uri(uri)
         assert self.s3uri.is_file(), "Uri (got {0}) must be a file (not directory or bucket) on S3.".format(uri)
-        self.__init_s3()
+        if s3:
+            self.s3 = s3
+        else:
+            self.__init_s3()
         StringIO.StringIO.__init__(self)
 
         if self.mode == 'r':
@@ -146,7 +150,6 @@ class S3File(StringIO.StringIO):
         if self.mode == 'w':
             self.flush()
             self.s3.putfile(self, self.s3uri)
-
 
 class GzipS3File(gzip.GzipFile):
     def __init__(self, uri, *args, **kwargs):
