@@ -1,5 +1,4 @@
 import os
-import copy
 
 from splits.util import path_for_part
 
@@ -14,7 +13,7 @@ class SplitWriter(object):
         self.basepath = basepath
         self.lines_per_file = lines_per_file
         self.fileClass = fileClass
-        self.fileArgs = copy.deepcopy(fileArgs)
+        self.fileArgs = fileArgs
         self._seqnum = 0
         self._linenum = 0
         self._filelinenum = 0
