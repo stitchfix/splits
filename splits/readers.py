@@ -1,5 +1,3 @@
-import copy
-
 from splits.util import path_for_part
 
 class SplitReader(object):
@@ -7,7 +5,7 @@ class SplitReader(object):
                  fileClass=open,
                  fileArgs={'mode': 'r'}):
         self.fileClass = fileClass
-        self.fileArgs = copy.deepcopy(fileArgs)
+        self.fileArgs = fileArgs
 
         if type(manifest_path_or_list) == list:
             self.manifest = iter(self._get_files(manifest_path_or_list))

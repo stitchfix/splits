@@ -154,7 +154,8 @@ class S3File(StringIO.StringIO):
 class GzipS3File(gzip.GzipFile):
     def __init__(self, uri, *args, **kwargs):
         mode = kwargs['mode'] if 'mode' in kwargs else 'r'
-        self.s3File = S3File(uri, mode=mode)
+        s3 = kwargs['s3'] if 's3' in kwargs else None
+        self.s3File = S3File(uri, mode=mode, s3=s3)
         super(GzipS3File, self).__init__(fileobj=self.s3File, mode=mode)
 
     def close(self):
