@@ -57,8 +57,10 @@ class SplitReader(object):
 
                 if num > 0 and len(val) == num:
                     break
-        except:
+        except StopIteration:
             pass
+        except Exception as e:
+            raise Exception("Unhandled exception in SplitReader:"+repr(e))
 
         return val
 
@@ -81,8 +83,10 @@ class SplitReader(object):
                     break
                 elif line.endswith('\n'):
                     break
-        except:
+        except StopIteration:
             pass
+        except Exception as e:
+            raise Exception("Unhandled exception in SplitReader:"+repr(e))
 
         return line
 
