@@ -59,8 +59,6 @@ class SplitReader(object):
                     break
         except StopIteration:
             pass
-        except Exception as e:
-            raise Exception("Unhandled exception in SplitReader:"+repr(e))
 
         return val
 
@@ -85,8 +83,6 @@ class SplitReader(object):
                     break
         except StopIteration:
             pass
-        except Exception as e:
-            raise Exception("Unhandled exception in SplitReader:"+repr(e))
 
         return line
 
