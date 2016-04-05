@@ -2,9 +2,11 @@ import StringIO
 import gzip
 import boto.s3
 import boto.s3.connection
+import boto.provider
 import urlparse
 import zipfile
 from itertools import groupby
+
 
 def is_s3_uri(uri):
     uri = str(uri)
@@ -42,14 +44,20 @@ class S3Uri(object):
     def __str__(self):
         return self.name
 
-
 class S3(object):
+    aws_settings_provider = None
 
     def __init__(self, region='us-east-1'):
+        # use a single provider to avoid NoAuthHandler exceptions
+        # see: http://blog.johnryding.com/post/122337566993/solving-intermittent-noauthhandlerfound-errors-in
+        if S3.aws_settings_provider is None:
+            S3.aws_settings_provider = boto.provider.Provider('aws')
+
         self._conn = boto.s3.connect_to_region(
             region,
-            calling_format=boto.s3.connection.OrdinaryCallingFormat()
-    )
+            calling_format=boto.s3.connection.OrdinaryCallingFormat(),
+            provider=S3.aws_settings_provider
+        )
 
     @property
     def access_key(self):
