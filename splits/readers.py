@@ -57,7 +57,7 @@ class SplitReader(object):
 
                 if num > 0 and len(val) == num:
                     break
-        except:
+        except StopIteration:
             pass
 
         return val
@@ -81,7 +81,7 @@ class SplitReader(object):
                     break
                 elif line.endswith('\n'):
                     break
-        except:
+        except StopIteration:
             pass
 
         return line
