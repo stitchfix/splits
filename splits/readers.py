@@ -30,9 +30,9 @@ class SplitReader(object):
         return self
 
     def __next__(self):
-        return self.next()
+        return next(self)
 
-    def next(self):
+    def __next__(self):
         line = self.readline()
         if line:
             return line

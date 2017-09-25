@@ -1,9 +1,9 @@
-import StringIO
+import io
 import gzip
 import boto.s3
 import boto.s3.connection
 import boto.provider
-import urlparse
+import urllib.parse
 import zipfile
 from itertools import groupby
 
@@ -17,7 +17,7 @@ class S3Uri(object):
     def __init__(self, uri):
         uri = str(uri)
         assert is_s3_uri(uri), "Invalid S3 uri - '{0}'".format(uri)
-        self._parseresult = urlparse.urlparse(uri)
+        self._parseresult = urllib.parse.urlparse(uri)
 
     @property
     def bucket(self):
@@ -127,7 +127,7 @@ class S3(object):
                     raise IOError('Could not delete keys: {keys}'.format(
                         keys=[k for k in returned_keys.errors]))
 
-class S3File(StringIO.StringIO):
+class S3File(io.StringIO):
     s3 = None
 
     def __init__(self, uri, mode='r', s3 = None):
@@ -138,7 +138,7 @@ class S3File(StringIO.StringIO):
             self.s3 = s3
         else:
             self.__init_s3()
-        StringIO.StringIO.__init__(self)
+        io.StringIO.__init__(self)
 
         if self.mode == 'r':
             self.s3.getfile(self.s3uri, self)
