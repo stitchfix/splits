@@ -1,7 +1,9 @@
 from splits.util import path_for_part
 
+
 class SplitReader(object):
-    def __init__(self, manifest_path_or_list,
+    def __init__(self,
+                 manifest_path_or_list,
                  fileClass=open,
                  fileArgs={'mode': 'r'}):
         self.fileClass = fileClass
@@ -15,10 +17,10 @@ class SplitReader(object):
 
             with self.fileClass(manifest_path_or_list, **self.fileArgs) as f:
                 # remove newlines from filenames
-                self.manifest = iter(self._get_files([x[:-1] for x in f.readlines()]))
+                self.manifest = iter(
+                    self._get_files([x[:-1] for x in f.readlines()]))
 
         self._current_file = next(self.manifest)
-
 
     def __enter__(self):
         return self
@@ -43,6 +45,10 @@ class SplitReader(object):
 
     def read(self, num=None):
         val = ''
+
+        if num is None:
+            num = 0
+
         try:
             while True:
                 if num > 0:
@@ -65,10 +71,14 @@ class SplitReader(object):
     def readline(self, limit=None):
         line = ''
 
+        if limit is None:
+            limit = 0
+
         try:
             while True:
                 if limit > 0:
-                    new_data = self._get_current_file().readline(limit - len(line))
+                    new_data = self._get_current_file().readline(
+                        limit - len(line))
                 else:
                     new_data = self._get_current_file().readline()
 
