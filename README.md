@@ -30,3 +30,15 @@ if __name__ == '__main__':
             print line
 
 ```
+
+## Tests
+
+```
+ $ pip install tox
+```
+
+To run the tests in both Python2 and Python3 run,
+
+```
+ $ tox
+```
