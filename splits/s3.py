@@ -127,7 +127,7 @@ class S3(object):
                     raise IOError('Could not delete keys: {keys}'.format(
                         keys=[k for k in returned_keys.errors]))
 
-class S3File(six.BytesIO):
+class S3File(six.BytesIO, object):
     s3 = None
 
     def __init__(self, uri, mode='r', s3 = None):
@@ -154,10 +154,11 @@ class S3File(six.BytesIO):
     def __exit__(self, type, value, traceback):
         self.close()
 
-    def write(self, data):
-        if isinstance(data, six.string_types):
-            data = data.encode()
-        super(S3File, self).write(data)
+    if six.PY3:
+        def write(self, data):
+            if isinstance(data, six.string_types):
+                data = data.encode()
+            super(S3File, self).write(data)
 
     def close(self):
         if self.mode == 'w':
@@ -175,7 +176,8 @@ class GzipS3File(gzip.GzipFile):
         super(GzipS3File, self).close()
         self.s3File.close()
 
-    def write(self, data):
-        if isinstance(data, six.string_types):
-            data = data.encode()
-        super(GzipS3File, self).write(data)
+    if six.PY3:
+        def write(self, data):
+            if isinstance(data, six.string_types):
+                data = data.encode()
+            super(GzipS3File, self).write(data)
