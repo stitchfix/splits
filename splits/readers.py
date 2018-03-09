@@ -59,7 +59,7 @@ class SplitReader(object):
                 if not new_data:
                     self._current_file.close()
                 else:
-                    val += new_data
+                    val += new_data.decode('utf-8')
 
                 if num > 0 and len(val) == num:
                     break
@@ -85,7 +85,7 @@ class SplitReader(object):
                 if not new_data:
                     self._current_file.close()
                 else:
-                    line += new_data
+                    line += new_data.decode('utf-8')
 
                 if limit > 0 and len(line) == limit:
                     break
