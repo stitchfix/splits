@@ -4,4 +4,4 @@ splits.egg-info
 __pycache__
 .pytest_cache
 .tox
-MANIFEST
+.idea
