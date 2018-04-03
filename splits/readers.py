@@ -86,6 +86,8 @@ class SplitReader(object):
                 if not new_data:
                     self._current_file.close()
                 else:
+                    if isinstance(new_data, bytes):
+                        new_data = new_data.decode('utf-8')
                     line += new_data
 
                 if limit > 0 and len(line) == limit:
