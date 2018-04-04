@@ -1,4 +1,3 @@
-from splits.util import path_for_part
 
 
 class SplitReader(object):
@@ -59,6 +58,8 @@ class SplitReader(object):
                 if not new_data:
                     self._current_file.close()
                 else:
+                    if isinstance(new_data, bytes):
+                        new_data = new_data.decode('utf-8')
                     val += new_data
 
                 if num > 0 and len(val) == num:
@@ -85,6 +86,8 @@ class SplitReader(object):
                 if not new_data:
                     self._current_file.close()
                 else:
+                    if isinstance(new_data, bytes):
+                        new_data = new_data.decode('utf-8')
                     line += new_data
 
                 if limit > 0 and len(line) == limit:
