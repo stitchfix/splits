@@ -5,7 +5,7 @@ with open('README.md') as readme_file:
 
 setup(
     name='splits',
-    version='0.1.6',
+    version='0.1.7',
     author='Thomas Millar, Jeff Magnusson',
     author_email='millar.thomas@gmail.com, magnussj@gmail.com',
     license='MIT',
