@@ -4,7 +4,7 @@ class SplitReader(object):
     def __init__(self,
                  manifest_path_or_list,
                  fileClass=open,
-                 fileArgs={'mode': 'r'}):
+                 fileArgs={'mode': 'rb'}):
         self.fileClass = fileClass
         self.fileArgs = fileArgs
 
@@ -43,7 +43,7 @@ class SplitReader(object):
         pass
 
     def read(self, num=None):
-        val = ''
+        val = b''
 
         if num is None:
             num = 0
@@ -58,8 +58,6 @@ class SplitReader(object):
                 if not new_data:
                     self._current_file.close()
                 else:
-                    if isinstance(new_data, bytes):
-                        new_data = new_data.decode('utf-8')
                     val += new_data
 
                 if num > 0 and len(val) == num:
@@ -70,7 +68,7 @@ class SplitReader(object):
         return val
 
     def readline(self, limit=None):
-        line = ''
+        line = b''
 
         if limit is None:
             limit = 0
@@ -86,13 +84,11 @@ class SplitReader(object):
                 if not new_data:
                     self._current_file.close()
                 else:
-                    if isinstance(new_data, bytes):
-                        new_data = new_data.decode('utf-8')
                     line += new_data
 
                 if limit > 0 and len(line) == limit:
                     break
-                elif line.endswith('\n'):
+                elif line.endswith(b'\n'):
                     break
         except StopIteration:
             pass

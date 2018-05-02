@@ -3,7 +3,12 @@ import tempfile
 import shutil
 import os
 
-from splits import SplitReader, SplitWriter
+from context import SplitReader, SplitWriter
+
+
+def stringify(intval, skip_nl):
+    newline = '\n' if not skip_nl else ''
+    return (str(intval) + newline).encode("utf-8")
 
 
 class TestMultiReader(unittest.TestCase):
@@ -14,7 +19,8 @@ class TestMultiReader(unittest.TestCase):
         os.makedirs(self.path)
 
         self.writer = SplitWriter(self.path, suffix='.txt', lines_per_file=2)
-        self.writer.writelines("\n".join([str(x) for x in range(0, 10)]))
+        #self.writer.writelines(b'\n'.join([str(x).encode("utf-8") for x in range(0, 10)]))
+        self.writer.writelines([stringify(x, x == 9) for x in range(0, 10)])
         self.writer.close()
 
         self.reader = SplitReader(self.path + '.manifest')
@@ -26,46 +32,46 @@ class TestMultiReader(unittest.TestCase):
     def test_read(self):
         lines = self.reader.read()
 
-        self.assertEquals(len(lines.split('\n')), 10)
-        for index, x in enumerate(lines.split('\n')):
-            self.assertEquals(x, str(index))
+        self.assertEqual(len(lines.split(b'\n')), 10)
+        for index, x in enumerate(lines.split(b'\n')):
+            self.assertEqual(x, str(index).encode('utf-8'))
 
     def test_read_n_chars(self):
-        for index, x in enumerate(range(0, 19)):
+        for index in range(0, 19):
             char = self.reader.read(1)
             if index % 2 == 0:
-                self.assertEquals(char, str(x/2))
+                self.assertEqual(char, str(index // 2).encode('utf-8'))
             else:
-                self.assertEquals(char, '\n')
+                self.assertEqual(char, b'\n')
 
-        self.assertEquals(self.reader.read(1), '')
+        self.assertEqual(self.reader.read(1), b'')
 
     def test_read_n_chars(self):
         chars = self.reader.read(11)
-        self.assertEquals(chars, '0\n1\n2\n3\n4\n5')
+        self.assertEqual(chars, b'0\n1\n2\n3\n4\n5')
 
     def test_readlines(self):
         lines = self.reader.readlines()
-        self.assertEquals(len(lines), 10)
+        self.assertEqual(len(lines), 10)
 
     def test_read_line_n_chars(self):
         line = self.reader.readline(1)
-        self.assertEquals('0', line)
+        self.assertEqual(b'0', line)
         line = self.reader.readline()
-        self.assertEquals('\n', line)
+        self.assertEqual(b'\n', line)
         line = self.reader.readline()
-        self.assertEquals('1\n', line)
+        self.assertEqual(b'1\n', line)
         line = self.reader.readline(2)
-        self.assertEquals('2\n', line)
+        self.assertEqual(b'2\n', line)
         line = self.reader.readline()
-        self.assertEquals('3\n', line)
+        self.assertEqual(b'3\n', line)
 
     def test_reader_is_iterator(self):
         count = 0
         for line in self.reader:
             count += 1
 
-        self.assertEquals(count, 10)
+        self.assertEqual(count, 10)
 
     def test_manual_manifest(self):
         manifest = [os.path.join(self.path, '%06d%s' % (x, '.txt'))
@@ -74,9 +80,9 @@ class TestMultiReader(unittest.TestCase):
         self.reader = SplitReader(manifest)
         lines = self.reader.read()
 
-        self.assertEquals(len(lines.split('\n')), 10)
-        for index, x in enumerate(lines.split('\n')):
-            self.assertEquals(x, str(index))
+        self.assertEqual(len(lines.split(b'\n')), 10)
+        for index, x in enumerate(lines.split(b'\n')):
+            self.assertEqual(x, str(index).encode('utf-8'))
 
     def test_manual_subset_manifest(self):
         manifest = [os.path.join(self.path, '%06d%s' % (x, '.txt'))
@@ -85,8 +91,6 @@ class TestMultiReader(unittest.TestCase):
         self.reader = SplitReader(manifest)
         lines = self.reader.read()
 
-        self.assertEquals(len(lines.split('\n')[:-1]), 6)
-        for index, x in enumerate(lines.split('\n')[:-1]):
-            self.assertEquals(x, str(index))
-
-
+        self.assertEqual(len(lines.split(b'\n')[:-1]), 6)
+        for index, x in enumerate(lines.split(b'\n')[:-1]):
+            self.assertEqual(x, str(index).encode('utf-8'))
