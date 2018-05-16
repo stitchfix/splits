@@ -1,4 +1,5 @@
 import os
+import six
 
 from splits.util import path_for_part
 
@@ -8,7 +9,7 @@ class SplitWriter(object):
                  suffix='',
                  lines_per_file=100000,
                  fileClass=open,
-                 fileArgs={'mode': 'w'}):
+                 fileArgs={'mode': 'wb'}):
         self.suffix = suffix
         self.basepath = basepath
         self.lines_per_file = lines_per_file
@@ -27,22 +28,26 @@ class SplitWriter(object):
         self.close()
 
     def write(self, data):
-        cnt = data.count('\n')
-        for index, line in enumerate(data.split('\n')):
+        if isinstance(data, six.string_types):
+            data = data.encode('utf-8')
+        cnt = data.count(b'\n')
+        for index, line in enumerate(data.split(b'\n')):
             if index == cnt:
                 self._write_line(line)
             else:
-                self._write_line(line + '\n')
+                self._write_line(line + b'\n')
 
     def writelines(self, lines):
         for line in lines:
+            if isinstance(line, six.string_types):
+                line = line.encode('utf-8')
             self._write_line(line)
 
     def _write_line(self, line):
         f = self._get_current_file()
         f.write(line)
-        self._linenum += line.count('\n')
-        self._filelinenum += line.count('\n')
+        self._linenum += line.count(b'\n')
+        self._filelinenum += line.count(b'\n')
 
     def close(self):
         if self._current_file:
@@ -52,7 +57,7 @@ class SplitWriter(object):
         path += '.manifest'
 
         f = self.fileClass(path, **self.fileArgs)
-        f.write(''.join([x + '\n' for x in self._written_file_paths]))
+        f.write(b''.join([x + b'\n' for x in self._written_file_paths]))
         f.close()
 
     def _get_current_file(self):
@@ -69,5 +74,5 @@ class SplitWriter(object):
         self._seqnum += 1
         self._filelinenum = 0
         path = path_for_part(self.basepath, self._seqnum, self.suffix)
-        self._written_file_paths.append(path)
+        self._written_file_paths.append(path.encode('utf-8'))
         return self.fileClass(path, **self.fileArgs)

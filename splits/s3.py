@@ -140,7 +140,7 @@ class S3File(six.BytesIO, object):
             self.__init_s3()
         six.BytesIO.__init__(self)
 
-        if self.mode == 'r':
+        if 'r' in self.mode:
             self.s3.getfile(self.s3uri, self)
             self.seek(0)
 
@@ -161,13 +161,13 @@ class S3File(six.BytesIO, object):
             super(S3File, self).write(data)
 
     def close(self):
-        if self.mode == 'w':
+        if 'w' in self.mode:
             self.flush()
             self.s3.putfile(self, self.s3uri)
 
 class GzipS3File(gzip.GzipFile):
     def __init__(self, uri, *args, **kwargs):
-        mode = kwargs['mode'] if 'mode' in kwargs else 'r'
+        mode = kwargs['mode'] if 'mode' in kwargs else 'rb'
         s3 = kwargs['s3'] if 's3' in kwargs else None
         self.s3File = S3File(uri, mode=mode, s3=s3)
         super(GzipS3File, self).__init__(fileobj=self.s3File, mode=mode)

@@ -3,7 +3,12 @@ import tempfile
 import shutil
 import os
 
-from splits import SplitWriter
+from context import SplitWriter
+
+
+def stringify(intval, skip_nl):
+    newline = '\n' if not skip_nl else ''
+    return (str(intval) + newline).encode("utf-8")
 
 
 class TestMultiWriter(unittest.TestCase):
@@ -24,7 +29,7 @@ class TestMultiWriter(unittest.TestCase):
         return os.path.isfile(path)
 
     def test_writes_correct_number_of_files(self):
-        self.writer.write('\n'.join([str(x) for x in range(0, 10)]))
+        self.writer.write(b'\n'.join([stringify(x, True) for x in range(0, 10)]))
 
         for i in range(1, 6):
             self.assertTrue(self.fileExists('%06d.txt' % i))
@@ -32,7 +37,7 @@ class TestMultiWriter(unittest.TestCase):
         self.assertFalse(self.fileExists('%06d.txt' % 6))
 
     def test_writes_correct_number_of_files_with_writelines(self):
-        self.writer.writelines('\n'.join([str(x) for x in range(0, 10)]))
+        self.writer.writelines([stringify(x, x == 9) for x in range(0, 10)])
 
         for i in range(1, 6):
             self.assertTrue(self.fileExists('%06d.txt' % i))
@@ -40,7 +45,7 @@ class TestMultiWriter(unittest.TestCase):
         self.assertFalse(self.fileExists('%06d.txt' % 6))
 
     def test_writes_odd_number_of_lines(self):
-        self.writer.writelines('\n'.join([str(x) for x in range(0, 11)]))
+        self.writer.writelines([stringify(x, x == 10) for x in range(0, 11)])
 
         for i in range(1, 7):
             self.assertTrue(self.fileExists('%06d.txt' % i))
