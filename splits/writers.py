@@ -1,5 +1,4 @@
 import os
-import six
 
 from splits.util import path_for_part
 
@@ -28,7 +27,7 @@ class SplitWriter(object):
         self.close()
 
     def write(self, data):
-        if isinstance(data, six.string_types):
+        if not isinstance(data, bytes):
             data = data.encode('utf-8')
         cnt = data.count(b'\n')
         for index, line in enumerate(data.split(b'\n')):
@@ -39,7 +38,7 @@ class SplitWriter(object):
 
     def writelines(self, lines):
         for line in lines:
-            if isinstance(line, six.string_types):
+            if not isinstance(line, bytes):
                 line = line.encode('utf-8')
             self._write_line(line)
 

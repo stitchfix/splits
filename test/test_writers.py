@@ -36,6 +36,14 @@ class TestMultiWriter(unittest.TestCase):
 
         self.assertFalse(self.fileExists('%06d.txt' % 6))
 
+    def test_writes_correct_number_of_files_str(self):
+        self.writer.write('\n'.join(["ln{}".format(x) for x in range(0, 10)]))
+
+        for i in range(1, 6):
+            self.assertTrue(self.fileExists('%06d.txt' % i))
+
+        self.assertFalse(self.fileExists('%06d.txt' % 6))
+
     def test_writes_correct_number_of_files_with_writelines(self):
         self.writer.writelines([stringify(x, x == 9) for x in range(0, 10)])
 
@@ -51,3 +59,7 @@ class TestMultiWriter(unittest.TestCase):
             self.assertTrue(self.fileExists('%06d.txt' % i))
 
         self.assertFalse(self.fileExists('%06d.txt' % 7))
+
+
+if __name__ == "__main__":
+    unittest.main()
